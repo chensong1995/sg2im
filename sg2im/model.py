@@ -81,15 +81,15 @@ class Sg2ImModel(nn.Module):
     if mask_size is not None and mask_size > 0:
       self.mask_net = self._build_mask_net(num_objs, gconv_dim, mask_size)
 
-    rel_aux_layers = [2 * embedding_dim + 8, gconv_hidden_dim, num_preds]
-    self.rel_aux_net = build_mlp(rel_aux_layers, batch_norm=mlp_normalization)
+    #rel_aux_layers = [2 * embedding_dim + 8, gconv_hidden_dim, num_preds]
+    #self.rel_aux_net = build_mlp(rel_aux_layers, batch_norm=mlp_normalization)
 
-    refinement_kwargs = {
-      'dims': (gconv_dim + layout_noise_dim,) + refinement_dims,
-      'normalization': normalization,
-      'activation': activation,
-    }
-    self.refinement_net = RefinementNetwork(**refinement_kwargs)
+    #refinement_kwargs = {
+    #  'dims': (gconv_dim + layout_noise_dim,) + refinement_dims,
+    #  'normalization': normalization,
+    #  'activation': activation,
+    #}
+    #self.refinement_net = RefinementNetwork(**refinement_kwargs)
 
   def _build_mask_net(self, num_objs, dim, mask_size):
     output_dim = 1
@@ -146,10 +146,10 @@ class Sg2ImModel(nn.Module):
       mask_scores = self.mask_net(obj_vecs.view(O, -1, 1, 1))
       masks_pred = mask_scores.squeeze(1).sigmoid()
 
-    s_boxes, o_boxes = boxes_pred[s], boxes_pred[o]
-    s_vecs, o_vecs = obj_vecs_orig[s], obj_vecs_orig[o]
-    rel_aux_input = torch.cat([s_boxes, o_boxes, s_vecs, o_vecs], dim=1)
-    rel_scores = self.rel_aux_net(rel_aux_input)
+    #s_boxes, o_boxes = boxes_pred[s], boxes_pred[o]
+    #s_vecs, o_vecs = obj_vecs_orig[s], obj_vecs_orig[o]
+    #rel_aux_input = torch.cat([s_boxes, o_boxes, s_vecs, o_vecs], dim=1)
+    #rel_scores = self.rel_aux_net(rel_aux_input)
 
     H, W = self.image_size
     layout_boxes = boxes_pred if boxes_gt is None else boxes_gt
@@ -167,8 +167,9 @@ class Sg2ImModel(nn.Module):
       layout_noise = torch.randn(noise_shape, dtype=layout.dtype,
                                  device=layout.device)
       layout = torch.cat([layout, layout_noise], dim=1)
-    img = self.refinement_net(layout)
-    return img, boxes_pred, masks_pred, rel_scores
+    #img = self.refinement_net(layout)
+    #return img, boxes_pred, masks_pred, rel_scores
+    return layout
 
   def encode_scene_graphs(self, scene_graphs):
     """
